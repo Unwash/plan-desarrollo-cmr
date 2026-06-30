@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "jest",
-    "start": "node app.js"
+    "start": "node app.js",
+    "lint": "eslint ."
   },
   "keywords": [],
   "author": "",
@@ -17,6 +18,10 @@
     "mongoose": "^9.7.2"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.6.0",
+    "eslint-plugin-jest": "^29.15.4",
+    "globals": "^17.7.0",
     "jest": "^30.4.2"
   }
 }
