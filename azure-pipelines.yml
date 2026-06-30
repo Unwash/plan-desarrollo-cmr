@@ -1,0 +1,27 @@
+trigger:
+  branches:
+    include:
+      - dev
+      - main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+
+- task: NodeTool@0
+  inputs:
+    versionSpec: '22.x'
+  displayName: 'Instalar Node.js'
+
+- script: |
+    npm install
+  displayName: 'Instalar dependencias'
+
+- script: |
+    npm test
+  displayName: 'Ejecutar pruebas unitarias'
+
+- script: |
+    npm audit --audit-level=high
+  displayName: 'Escaneo básico de seguridad (npm audit)'
