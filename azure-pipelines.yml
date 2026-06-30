@@ -9,23 +9,23 @@ pool:
 
 steps:
 
-# 1. Verificar entorno (Node ya viene instalado en ubuntu-latest)
 - script: |
     node -v
     npm -v
-  displayName: 'Verificar Node y NPM'
+  displayName: Verificar entorno
 
-# 2. Instalar dependencias (modo CI recomendado)
 - script: |
     npm ci
-  displayName: 'Instalar dependencias (npm ci)'
+  displayName: Instalar dependencias
 
-# 3. Ejecutar pruebas unitarias
+- script: |
+    npm run lint
+  displayName: Lint
+
 - script: |
     npm test
-  displayName: 'Ejecutar pruebas unitarias'
+  displayName: Tests + Coverage
 
-# 4. Seguridad básica (OWASP nivel npm)
 - script: |
     npm audit --audit-level=high
-  displayName: 'Escaneo de seguridad npm audit'
+  displayName: Seguridad
