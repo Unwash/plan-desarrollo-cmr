@@ -1,7 +1,7 @@
 
 const express = require("express");
 const cors = require('cors')
-//const {dbConnection} = require("../database/config")
+const {dbConnection} = require("../database/config")
 
 
 class Server {
@@ -38,9 +38,9 @@ class Server {
     this.app.use(this.paths.prueba,require("../routes/prueba-route"))
   }
 
-//   async connectDb () {
-//     await dbConnection();
-//   }
+  async connectDb () {
+    await dbConnection();
+  }
 
   listen() {
     this.app.listen(this.port, () => {
