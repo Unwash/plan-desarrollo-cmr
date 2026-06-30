@@ -4,8 +4,9 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --coverage",
     "start": "node app.js",
+    "dev": "nodemon app.js",
     "lint": "eslint ."
   },
   "keywords": [],
@@ -22,6 +23,17 @@
     "eslint": "^10.6.0",
     "eslint-plugin-jest": "^29.15.4",
     "globals": "^17.7.0",
-    "jest": "^30.4.2"
+    "jest": "^30.4.2",
+    "nodemon": "^3.1.14"
+  },
+  "jest": {
+    "coverageThreshold": {
+      "global": {
+        "branches": 50,
+        "functions": 50,
+        "lines": 50,
+        "statements": 50
+      }
+    }
   }
 }
