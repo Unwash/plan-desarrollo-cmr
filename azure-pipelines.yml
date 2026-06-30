@@ -9,19 +9,23 @@ pool:
 
 steps:
 
-- task: NodeTool@0
-  inputs:
-    versionSpec: '22.x'
-  displayName: 'Instalar Node.js'
-
+# 1. Verificar entorno (Node ya viene instalado en ubuntu-latest)
 - script: |
-    npm install
-  displayName: 'Instalar dependencias'
+    node -v
+    npm -v
+  displayName: 'Verificar Node y NPM'
 
+# 2. Instalar dependencias (modo CI recomendado)
+- script: |
+    npm ci
+  displayName: 'Instalar dependencias (npm ci)'
+
+# 3. Ejecutar pruebas unitarias
 - script: |
     npm test
   displayName: 'Ejecutar pruebas unitarias'
 
+# 4. Seguridad básica (OWASP nivel npm)
 - script: |
     npm audit --audit-level=high
-  displayName: 'Escaneo básico de seguridad (npm audit)'
+  displayName: 'Escaneo de seguridad npm audit'
