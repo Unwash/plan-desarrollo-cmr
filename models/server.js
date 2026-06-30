@@ -10,7 +10,7 @@ class Server {
     //App de express
     this.app = express();
     //Variable de entorno
-    this.port = process.env.PORT;
+    this.port = process.env.PORT || 3000;
     //Rutas ubicacion
     this.paths = {
       prueba: "/api/prueba",
