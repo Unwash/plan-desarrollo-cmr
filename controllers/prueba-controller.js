@@ -1,5 +1,5 @@
 const pruebaControllerGet = (req, res) => {
-  res.json(" Get Funciona!!!!");
+  res.json(" Get Funciona!!!! bien");
 };
 
 const pruebaControllerPost = (req, res) => {
