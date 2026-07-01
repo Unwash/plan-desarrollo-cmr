@@ -14,9 +14,10 @@ class Server {
     //Rutas ubicacion
     this.paths = {
       prueba: "/api/prueba",
+      entry: "/api/entry"
     } 
     //Coneccion a base de datos 
-    //this.connectDb()
+    this.connectDb()
     //Middlewares
     this.middlewares()
     //Rutas de aplicacion
@@ -36,6 +37,7 @@ class Server {
 
   routes () {
     this.app.use(this.paths.prueba,require("../routes/prueba-route"))
+    this.app.use(this.paths.entry,require("../routes/entry-route"))
   }
 
   async connectDb () {
