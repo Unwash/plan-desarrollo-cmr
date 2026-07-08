@@ -9,23 +9,36 @@ pool:
 
 steps:
 
+# Verificar versiones de Node y npm
 - script: |
     node -v
     npm -v
   displayName: Verificar entorno
 
+# Instalar dependencias
 - script: |
     npm ci
   displayName: Instalar dependencias
 
+# Ejecutar ESLint
 - script: |
     npm run lint
   displayName: Lint
 
+# Ejecutar pruebas y generar cobertura
 - script: |
-    npm test
-  displayName: Tests + Coverage
+    npm run test:coverage
+  displayName: Ejecutar pruebas con cobertura
 
+# Publicar el reporte de cobertura en Azure DevOps
+- task: PublishCodeCoverageResults@2
+  displayName: Publicar cobertura
+  inputs:
+    summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml'
+    pathToSources: '$(System.DefaultWorkingDirectory)'
+    failIfCoverageEmpty: true
+
+# Auditoría de dependencias
 - script: |
     npm audit --audit-level=high
   displayName: Seguridad
