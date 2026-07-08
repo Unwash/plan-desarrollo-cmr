@@ -1,77 +1,65 @@
+```yaml
 name: AI Issue Review
 
 on:
   issues:
-    types: [opened]
+    types:
+      - opened
 
 permissions:
-  issues: write
   contents: read
+  issues: write
+  models: read
 
 jobs:
   analyze-issue:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Analizar issue con GitHub Models
+      - name: Generar análisis con GitHub Models
+        id: inference
+        uses: actions/ai-inference@v1
+        with:
+          model: openai/gpt-4o
+          system-prompt: |
+            Eres un desarrollador Senior experto en Node.js, Express,
+            pruebas unitarias, CI/CD, Azure Pipelines y seguridad OWASP.
+
+            Siempre responde en español utilizando Markdown.
+
+          prompt: |
+            Analiza el siguiente Issue de GitHub.
+
+            ## Título
+            ${{ github.event.issue.title }}
+
+            ## Descripción
+            ${{ github.event.issue.body }}
+
+            Genera la respuesta con el siguiente formato:
+
+            ## 📋 Resumen
+
+            ## 🔍 Posibles causas
+
+            ## 🛠️ Propuesta de solución
+
+            ## 🧪 Pruebas unitarias sugeridas
+
+            ## ⚠️ Riesgos o consideraciones
+
+      - name: Publicar comentario
         uses: actions/github-script@v7
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RESPONSE: ${{ steps.inference.outputs.response }}
         with:
           script: |
-            const issue = context.payload.issue;
-
-            const prompt = `
-            Eres un asistente experto en desarrollo de software.
-
-            Analiza el siguiente Issue de GitHub:
-
-            Título:
-            ${issue.title}
-
-            Descripción:
-            ${issue.body}
-
-            Genera una respuesta con:
-
-            1. Resumen del problema.
-            2. Posibles causas.
-            3. Propuesta de solución.
-            4. Pruebas unitarias recomendadas.
-            5. Riesgos o puntos a revisar.
-
-            Responde en español y con formato Markdown.
-            `;
-
-            const response = await fetch(
-              "https://models.github.ai/inference/chat/completions",
-              {
-                method: "POST",
-                headers: {
-                  "Authorization": `Bearer ${process.env.GITHUB_TOKEN}`,
-                  "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                  model: "openai/gpt-4o-mini",
-                  messages: [
-                    {
-                      role: "user",
-                      content: prompt
-                    }
-                  ],
-                  temperature: 0.3
-                })
-              }
-            );
-
-            const data = await response.json();
-
-            const answer =
-              data.choices[0].message.content;
-
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: issue.number,
-              body: `## 🤖 Análisis generado por IA\n\n${answer}`
+              issue_number: context.issue.number,
+              body: `## 🤖 Análisis generado por GitHub Models
+
+${process.env.RESPONSE}`
             });
+```
