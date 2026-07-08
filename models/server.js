@@ -2,7 +2,7 @@
 const express = require("express");
 const cors = require('cors')
 const {dbConnection} = require("../database/config")
-
+const helmet = require("helmet");
 
 class Server {
 
@@ -29,6 +29,8 @@ class Server {
   middlewares () { 
     //CORS
     this.app.use(cors())
+    //Helmet
+    this.app.use(helmet())
     //Lectura de parseo de Body
     this.app.use(express.json())
     // Directorio Publico
