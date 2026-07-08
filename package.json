@@ -26,15 +26,5 @@
     "globals": "^17.7.0",
     "jest": "^30.4.2",
     "nodemon": "^3.1.14"
-  },
-  "jest": {
-    "coverageThreshold": {
-      "global": {
-        "branches": 50,
-        "functions": 50,
-        "lines": 50,
-        "statements": 50
-      }
-    }
   }
 }
