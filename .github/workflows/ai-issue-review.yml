@@ -8,56 +8,41 @@ on:
 permissions:
   contents: read
   issues: write
-  models: read
 
 jobs:
   analyze-issue:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Generar análisis con GitHub Models
-        id: inference
-        uses: actions/ai-inference@v1
-        with:
-          model: openai/gpt-4o
-          system-prompt: |
-            Eres un desarrollador Senior experto en Node.js, Express,
-            pruebas unitarias, CI/CD, Azure Pipelines y seguridad OWASP.
+      - name: Enviar Issue a la API
+        id: api
+        run: |
+          RESPONSE=$(curl -s -X POST \
+            "https://plan-desarrollo-cmr.onrender.com/api/github/issue-review" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg title "${{ github.event.issue.title }}" \
+              --arg body "${{ github.event.issue.body }}" \
+              '{title:$title, body:$body}')")
 
-            Siempre responde en español utilizando Markdown.
+          echo "Respuesta recibida:"
+          echo "$RESPONSE"
 
-          prompt: |
-            Analiza el siguiente Issue de GitHub.
-
-            ## Título
-            ${{ github.event.issue.title }}
-
-            ## Descripción
-            ${{ github.event.issue.body }}
-
-            Genera la respuesta con el siguiente formato:
-
-            ## 📋 Resumen
-
-            ## 🔍 Posibles causas
-
-            ## 🛠️ Propuesta de solución
-
-            ## 🧪 Pruebas unitarias sugeridas
-
-            ## ⚠️ Riesgos o consideraciones
+          echo "response<<EOF" >> $GITHUB_OUTPUT
+          echo "$RESPONSE" | jq -r '.response' >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Publicar comentario
         uses: actions/github-script@v7
         env:
-          RESPONSE: ${{ steps.inference.outputs.response }}
+          RESPONSE: ${{ steps.api.outputs.response }}
         with:
           script: |
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: `## 🤖 Análisis generado por GitHub Models
+              body: `## 🤖 Análisis generado por la API
 
 ${process.env.RESPONSE}`
             });
