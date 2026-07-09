@@ -1,0 +1,48 @@
+name: AI Issue Review
+
+on:
+  issues:
+    types:
+      - opened
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  analyze-issue:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Enviar Issue a la API
+        id: api
+        run: |
+          RESPONSE=$(curl -s -X POST \
+            "https://plan-desarrollo-cmr.onrender.com/api/github/issue-review" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg title "${{ github.event.issue.title }}" \
+              --arg body "${{ github.event.issue.body }}" \
+              '{title:$title, body:$body}')")
+
+          echo "Respuesta recibida:"
+          echo "$RESPONSE"
+
+          echo "response<<EOF" >> $GITHUB_OUTPUT
+          echo "$RESPONSE" | jq -r '.response' >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Publicar comentario
+        uses: actions/github-script@v7
+        env:
+          RESPONSE: ${{ steps.api.outputs.response }}
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `## 🤖 Análisis generado por la API
+
+${process.env.RESPONSE}`
+            });

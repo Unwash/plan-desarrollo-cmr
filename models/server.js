@@ -14,7 +14,8 @@ class Server {
     //Rutas ubicacion
     this.paths = {
       prueba: "/api/prueba",
-      entry: "/api/entry"
+      entry: "/api/entry",
+      github: "/api/github"
     } 
     //Coneccion a base de datos 
     this.connectDb()
@@ -40,6 +41,7 @@ class Server {
   routes () {
     this.app.use(this.paths.prueba,require("../routes/prueba-route"))
     this.app.use(this.paths.entry,require("../routes/entry-route"))
+    this.app.use(this.paths.github,require("../routes/github-route"))
   }
 
   async connectDb () {
