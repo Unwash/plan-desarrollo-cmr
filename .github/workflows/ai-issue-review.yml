@@ -14,10 +14,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Enviar Issue a la API
+
+      - name: Analizar Issue
         id: api
+        shell: bash
         run: |
-          RESPONSE=$(curl -s -X POST \
+
+          RESPONSE=$(curl --fail --silent --show-error \
+            --max-time 60 \
+            -X POST \
             "https://plan-desarrollo-cmr.onrender.com/api/github/issue-review" \
             -H "Content-Type: application/json" \
             -d "$(jq -n \
@@ -25,12 +30,20 @@ jobs:
               --arg body "${{ github.event.issue.body }}" \
               '{title:$title, body:$body}')")
 
-          echo "Respuesta recibida:"
           echo "$RESPONSE"
 
-          echo "response<<EOF" >> $GITHUB_OUTPUT
-          echo "$RESPONSE" | jq -r '.response' >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          RESULT=$(echo "$RESPONSE" | jq -r '.response // empty')
+
+          if [ -z "$RESULT" ]; then
+            echo "La API no devolvió una respuesta válida."
+            exit 1
+          fi
+
+          {
+            echo "response<<EOF"
+            echo "$RESULT"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Publicar comentario
         uses: actions/github-script@v7
@@ -38,13 +51,9 @@ jobs:
           RESPONSE: ${{ steps.api.outputs.response }}
         with:
           script: |
-            const body = `## 🤖 Análisis generado por la API
-
-            ${process.env.RESPONSE}`;
-
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body
+              body: process.env.RESPONSE
             });
