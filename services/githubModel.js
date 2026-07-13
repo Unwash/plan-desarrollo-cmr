@@ -9,11 +9,6 @@ const analizarIssue = async (title, body) => {
         throw new Error("No existe la variable de entorno GITHUB_TOKEN");
     }
 
-    // resto del código...
-};
-
-const analizarIssue = async (title, body) => {
-
     const prompt = `
 Eres un desarrollador Senior experto en:
 
