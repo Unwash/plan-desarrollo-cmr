@@ -1,17 +1,35 @@
+const { analizarIssue } = require("../services/githubModels");
+
 const postResponse = async (req, res) => {
 
-    const { title,body } = req.body
+    const { title, body } = req.body;
 
-    if(!title || !body) return res.status(400).json({message:"Parametros incompletos, se requiere title y body"})
+    if (!title || !body) {
+        return res.status(400).json({
+            message: "Parámetros incompletos, se requiere title y body."
+        });
+    }
 
     try {
-        return res.json({response:`Gracias por tu issue, lo recibimos con exito. Titulo: ${title}, Body: ${body}`})
+
+        const respuesta = await analizarIssue(title, body);
+
+        return res.json({
+            response: respuesta
+        });
+
     } catch (error) {
-        console.log(error)
-        return res.status(500).json({ message: "Error al recibir el issue" })
+
+        console.error(error);
+
+        return res.status(500).json({
+            message: "Error al analizar el issue."
+        });
+
     }
-}
+
+};
 
 module.exports = {
     postResponse
-}
+};
