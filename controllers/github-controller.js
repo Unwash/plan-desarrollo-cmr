@@ -1,4 +1,4 @@
-const { analizarIssue } = require("../services/githubModels");
+const { analizarIssue } = require("../services/githubModel");
 
 const postResponse = async (req, res) => {
 
