@@ -1,13 +1,16 @@
 const axios = require("axios");
 
-const MODEL = process.env.GITHUB_MODEL || "openai/gpt-4.1";
-const TOKEN = process.env.GITHUB_TOKEN;
 
 const analizarIssue = async (title, body) => {
+
+    const MODEL = process.env.GITHUB_MODEL || "openai/gpt-4.1";
+    const TOKEN = process.env.GITHUB_TOKEN;
+
 
     if (!TOKEN) {
         throw new Error("No existe la variable de entorno GITHUB_TOKEN");
     }
+
 
     const prompt = `
 Eres un desarrollador Senior experto en:
@@ -60,6 +63,7 @@ Responde exactamente con este formato Markdown:
 - [ ] Seguridad
 `;
 
+
     const response = await axios.post(
         "https://models.github.ai/inference/chat/completions",
         {
@@ -75,7 +79,7 @@ Responde exactamente con este formato Markdown:
         },
         {
             headers: {
-                Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+                Authorization: `Bearer ${TOKEN}`,
                 "Content-Type": "application/json",
                 Accept: "application/vnd.github+json",
                 "X-GitHub-Api-Version": "2026-03-10"
@@ -83,8 +87,11 @@ Responde exactamente con este formato Markdown:
         }
     );
 
+
     return response.data.choices[0].message.content;
+
 };
+
 
 module.exports = {
     analizarIssue
